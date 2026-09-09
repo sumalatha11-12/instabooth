@@ -32,13 +32,20 @@ jobs:
       - name: Build Angular app
         run: npx ng build --configuration production --base-href /instabooth/
 
+      - name: Locate build directory
+        id: find-dist
+        run: |
+          DIST_DIR=$(find dist -name "index.html" -exec dirname {} \; | head -n 1)
+          echo "Found build folder at: $DIST_DIR"
+          echo "dist_path=$DIST_DIR" >> $GITHUB_OUTPUT
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/instabooth/browser/
+          path: ${{ steps.find-dist.outputs.dist_path }}
 
   deploy:
     environment:
